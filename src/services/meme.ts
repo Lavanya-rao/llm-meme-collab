@@ -39,6 +39,28 @@ function tryExtractJSON(text: string) {
   }
 }
 
+export type AssistantMemeResult = {
+  id?: string;
+  templateId?: string;
+  caption?: string;
+  imageUrl?: string;
+};
+
+export function normalizeAssistantMemes(parsed: unknown, templates: Template[]): Meme[] {
+  const arr = Array.isArray(parsed) ? (parsed as any[]) : [parsed as any];
+  return arr.map((it) => {
+    const a = it as AssistantMemeResult;
+    const template = templates.find((t) => t.id === a.templateId);
+    return {
+      id: a.id ?? crypto.randomUUID(),
+      templateId: a.templateId ?? template?.id ?? "",
+      caption: String(a.caption ?? ""),
+      imageUrl: a.imageUrl ?? template?.imageUrl ?? "",
+      source: "ai",
+    } as Meme;
+  });
+}
+
 export async function generateMemesAI(
   topic: Topic | null,
   templates: Template[],
@@ -82,19 +104,8 @@ export async function generateMemesAI(
     const assistant = body?.choices?.[0]?.message?.content ?? "";
     const parsed = tryExtractJSON(assistant);
 
-    const arr = Array.isArray(parsed) ? parsed : [parsed];
-
-    const memes: Meme[] = arr.map((it: any) => {
-      const template = templates.find((t) => t.id === it.templateId);
-      return {
-        id: crypto.randomUUID(),
-        templateId: it.templateId ?? template?.id ?? "",
-        caption: String(it.caption ?? ""),
-        imageUrl: template?.imageUrl ?? "",
-        source: "ai",
-      } as Meme;
-    });
-
+    // Normalize assistant output into a strongly-typed Meme[]
+    const memes = normalizeAssistantMemes(parsed, templates);
     return memes;
   } catch (err) {
     console.error("generateMemesAI error:", err);

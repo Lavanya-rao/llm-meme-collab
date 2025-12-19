@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../../app/session/SessionContext";
-<<<<<<< Updated upstream
-import Templates from "../../Components/Templates/Templates";
-=======
 import "./Consent.css";
->>>>>>> Stashed changes
 
 export default function Consent() {
   const nav = useNavigate();

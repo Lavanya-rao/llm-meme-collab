@@ -42,6 +42,20 @@ The application will be available at:
 http://localhost:5173
 ```
 
+## 🔐 OpenAI key & local env
+
+To enable AI features during local development, create a file named `.env.local` at the repository root and add your key:
+
+```env
+VITE_OPENAI_KEY=sk-...
+```
+
+Restart the dev server after changing `.env.local` for the value to take effect.
+
+**Security note:** `.env.local` is ignored by Git (it is listed in `.gitignore`) so secrets won't be committed. For production, avoid embedding API keys in frontend bundles — instead implement a server-side proxy (for example an Express or serverless endpoint) that uses a server-only env var like `OPENAI_API_KEY` and forwards requests from the client.
+
+If no `VITE_OPENAI_KEY` is present, the app falls back to mocked AI responses so you can continue UI testing without an API key.
+
 ---
 
 ## 🛠️ Build for Production
